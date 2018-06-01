@@ -30,6 +30,8 @@ import com.uwetrottmann.tmdb2.services.TvEpisodesService;
 import com.uwetrottmann.tmdb2.services.TvSeasonsService;
 import com.uwetrottmann.tmdb2.services.TvService;
 import java.io.IOException;
+import java.net.Proxy;
+
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
@@ -72,6 +74,8 @@ public class Tmdb {
     private Retrofit retrofit;
 
     private String apiKey;
+
+    private Proxy proxy;
 
     private Boolean hasGuestSession = false;
     private Boolean hasAccountSession = false;
@@ -134,6 +138,10 @@ public class Tmdb {
         return apiKey;
     }
 
+    public Proxy getProxy() { return proxy; }
+
+    public void setProxy(Proxy proxy) { this.proxy = proxy; }
+
     /**
      * Creates a {@link Retrofit.Builder} that sets the base URL, adds a Gson converter and sets {@link #okHttpClient()}
      * as its client.
@@ -155,11 +163,17 @@ public class Tmdb {
      * @see #setOkHttpClientDefaults(OkHttpClient.Builder)
      */
     protected synchronized OkHttpClient okHttpClient() {
-        if (okHttpClient == null) {
+        if (okHttpClient == null ||
+                (proxy != null && !proxy.equals(okHttpClient.proxy()))) {
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
             setOkHttpClientDefaults(builder);
-            okHttpClient = builder.build();
+            if(proxy != null){
+                okHttpClient= builder.proxy(proxy).build();
+            }else {
+                okHttpClient = builder.build();
+            }
         }
+
         return okHttpClient;
     }
 
