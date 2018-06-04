@@ -190,7 +190,8 @@ public class Tmdb {
      * data.
      */
     protected Retrofit getRetrofit() {
-        if (retrofit == null) {
+        if (retrofit == null ||
+                (proxy != null && !proxy.equals(okHttpClient.proxy()))) {
             retrofit = retrofitBuilder().build();
         }
         return retrofit;
